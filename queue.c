@@ -20,7 +20,7 @@ void q_free(struct list_head *head)
     element_t *entry, *tmp = NULL;
     list_for_each_entry_safe (entry, tmp, head, list) {
         list_del(&entry->list);
-        q_release_elemet(entry);
+        q_release_element(entry);
     }
     free(head);
 }
