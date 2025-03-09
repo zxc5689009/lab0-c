@@ -230,7 +230,7 @@ static struct list_head *merge_lists(struct list_head *l1,
         tail = tail->next;
     }
     tail->next = l1 ? l1 : l2;
-    return dummy.next;
+    return tmp.next;
 }
 static struct list_head *merge_sort_list(struct list_head *head, bool descend)
 {
@@ -274,7 +274,29 @@ void q_sort(struct list_head *head, bool descend)
 int q_ascend(struct list_head *head)
 {
     // https://leetcode.com/problems/remove-nodes-from-linked-list/
-    return 0;
+    if (!head || head->next == head || head->next->next == head)
+        return 0;
+    int removed = 0;
+    struct list_head *cur = head->prev;
+    element_t *tail_element = list_entry(cur, element_t, list);
+    char *min_value = tail_element->value;
+    cur = cur->prev;
+    while (cur != head) {
+        element_t *tmp_element = list_entry(cur, element_t, list);
+        if (strcmp(tmp_element->value, min_value) > 0) {
+            struct list_head *tmp = cur->prev;
+            list_del(cur);
+            q_release_element(tmp_element);
+            removed++;
+            cur = tmp;
+        } else {
+            if (strcmp(tmp_element->value, min_value) < 0) {
+                min_value = tmp_element->value;
+            }
+            cur = cur->prev;
+        }
+    }
+    return removed;
 }
 
 /* Remove every node which has a node with a strictly greater value anywhere to
