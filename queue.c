@@ -207,8 +207,67 @@ void q_reverseK(struct list_head *head, int k)
     }
 }
 
+static struct list_head *merge_lists(struct list_head *l1,
+                                     struct list_head *l2,
+                                     bool descend)
+{
+    struct list_head tmp;
+    tmp.next = NULL;
+    struct list_head *tail = &tmp;
+    while (l1 && l2) {
+        element_t *element1 = list_entry(l1, element_t, list);
+        element_t *element2 = list_entry(l2, element_t, list);
+        int cmp = strcmp(element1->value, element2->value);
+        if (descend)
+            cmp = -cmp;
+        if (cmp <= 0) {
+            tail->next = l1;
+            l1 = l1->next;
+        } else {
+            tail->next = l2;
+            l2 = l2->next;
+        }
+        tail = tail->next;
+    }
+    tail->next = l1 ? l1 : l2;
+    return dummy.next;
+}
+static struct list_head *merge_sort_list(struct list_head *head, bool descend)
+{
+    if (!head || head->next == head || head->next->next == head)
+        return head;
+    struct list_head *slow = head, *fast = head->next;
+    while (fast->next && fast->next->next) {
+        fast = fast->next->next;
+        slow = slow->next;
+    }
+    struct list_head *mid = slow->next;
+    slow->next = NULL;
+    struct list_head *left = merge_sort_list(head, descend);
+    struct list_head *right = merge_sort_list(mid, descend);
+    return merge_lists(left, right, descend);
+}
+
 /* Sort elements of queue in ascending/descending order */
-void q_sort(struct list_head *head, bool descend) {}
+void q_sort(struct list_head *head, bool descend)
+{
+    if (!head || head->next == head || head->next->next == head) {
+        return;
+    }
+    struct list_head *first = head->next;
+    head->prev->next = NULL;
+    struct list_head *sorted = merge_sort_list(first, descend);
+    head->next = sorted;
+    struct list_head *prev = head;
+    struct list_head *cur = sorted;
+    while (cur) {
+        cur->prev = prev;
+        prev = cur;
+        cur = cur->next;
+    }
+    prev->next = head;
+    head->prev = prev;
+}
 
 /* Remove every node which has a node with a strictly less value anywhere to
  * the right side of it */
@@ -231,5 +290,7 @@ int q_descend(struct list_head *head)
 int q_merge(struct list_head *head, bool descend)
 {
     // https://leetcode.com/problems/merge-k-sorted-lists/
+    if (!head || head->next == head || head->next->next == head)
+        return 0;
     return 0;
 }
