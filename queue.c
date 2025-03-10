@@ -234,7 +234,7 @@ static struct list_head *merge_lists(struct list_head *l1,
 }
 static struct list_head *merge_sort_list(struct list_head *head, bool descend)
 {
-    if (!head || head->next == head || head->next->next == head)
+    if (!head || head->next == NULL)
         return head;
     struct list_head *slow = head, *fast = head->next;
     while (fast->next && fast->next->next) {
@@ -306,7 +306,8 @@ int q_descend(struct list_head *head)
     // https://leetcode.com/problems/remove-nodes-from-linked-list/
     if (!head || head->next == head || head->next->next == head)
         return 0;
-    int removed = 0 struct list_head *cur = head->prev;
+    int removed = 0;
+    struct list_head *cur = head->prev;
     element_t *tail_element = list_entry(cur, element_t, list);
     char *max_value = tail_element->value;
     cur = cur->prev;
@@ -333,7 +334,5 @@ int q_descend(struct list_head *head)
 int q_merge(struct list_head *head, bool descend)
 {
     // https://leetcode.com/problems/merge-k-sorted-lists/
-    if (!head || head->next == head || head->next->next == head)
-        return 0;
     return 0;
 }
